@@ -1,506 +1,885 @@
 # LICENSEVAULT BUILD SPEC
-## BLI Legal Tech Hackathon 2 — Evidence-First MVP
+## BLI Legal Tech Hackathon 2 — Full Build Contract
 
 **Project:** LicenseVault  
-**Hackathon:** BLI Legal Tech Hackathon 2  
-**Organizer:** Blockchain Legal Institute (BLI)  
-**Primary technical ecosystem:** Story  
-**Core technical path:** Story IP licensing + Confidential Data Rails (CDR)  
-**Status:** Pre-build specification  
-**Date:** 2026-10-05
+**Status:** Build-ready master specification  
+**Date:** 2026-10-05  
+**Primary technical path:** Story Protocol IP licensing + Confidential Data Rails (CDR)  
+**Development network:** Story Aeneid testnet  
 
 ---
 
-# 0. BUILD CONTRACT
+# 0. READ THIS FIRST
 
-Build the smallest real product that proves:
+This document is the source-of-truth build contract for LicenseVault.
 
-> A user cannot read protected digital content without the required Story Protocol license, and can read it after obtaining the correct license.
+The product thesis is simple:
 
-The product is not a generic IP marketplace, legal AI assistant, document notarization tool, or compliance dashboard.
+> **A license should not merely exist as a record. For protected digital content, the license should determine whether the content can be read.**
 
-The core experience is:
+The MVP must prove one complete real flow:
 
-```
+```text
 PROTECTED RESOURCE
-        ↓
+      ↓
 LICENSE REQUIRED
-        ↓
-TRY WITHOUT LICENSE
-        ↓
+      ↓
+WALLET WITHOUT LICENSE
+      ↓
 READ REJECTED
-        ↓
-OBTAIN LICENSE
-        ↓
-TRY AGAIN
-        ↓
+      ↓
+OBTAIN CORRECT LICENSE
+      ↓
+READ AGAIN
+      ↓
 READ ALLOWED
-        ↓
-PROTECTED CONTENT DECRYPTED
-        ↓
-ONCHAIN / PROTOCOL PROOF
+      ↓
+PROTECTED CONTENT RECOVERED
+      ↓
+VERIFIABLE PROOF
 ```
 
-The protocol is the source of truth.
+The blockchain/protocol state is the source of truth. React state, database rows, screenshots, animations, logs, and success messages are not proof.
 
-UI state is never financial, legal, or authorization proof.
-
----
-
-# 1. NON-NEGOTIABLE RULES
-
-1. Never invent protocol addresses, contract interfaces, network IDs, asset IDs, RPC endpoints, SDK methods, sponsor claims, or transaction hashes.
-2. If a critical fact cannot be verified from current official source code/docs or live chain state, mark it UNVERIFIED and stop at the relevant phase.
-3. Never replace a failed protocol operation with a mock and call the result real.
-4. Never show ACCESS GRANTED unless the real protected-read flow succeeds.
-5. Never show a fake transaction or explorer link.
-6. Never put a private key, seed phrase, or credential in source control.
-7. Never ask the user for a seed phrase or private key.
-8. Never expose a server-side private key or internal API credential to browser code.
-9. Do not depend on the Story IP Portal as a runtime dependency.
-10. Do not claim Story is a BLI 2026 bounty partner until current BLI evidence confirms it.
-11. Use Story Aeneid/testnet during development unless current official requirements explicitly require another network.
-12. No paid dependency may be mandatory for the core MVP without explicit approval.
-13. Do not build extra features before the one complete gated-access flow is proven.
-14. The application must distinguish:
-   - NO LICENSE
-   - VERIFICATION ERROR
-   - LICENSE VERIFIED
-   - ACCESS GRANTED
-15. Legal claims must stay narrow and technically provable.
+**Do not build the polished frontend before the real protocol spike passes.**
 
 ---
 
-# 2. PRODUCT
+# 1. NON-NEGOTIABLE BUILD RULES
 
-## Product name
-
-LicenseVault
-
-Keep the name as the working project/product name unless a later naming review changes it.
-
-## Product category
-
-Licensed digital-asset access.
-
-## One-line product contract
-
-> LicenseVault turns an onchain IP license into a real access permission for protected digital content.
-
-## Human explanation
-
-> A protected digital asset stays locked until the connected wallet has the license required to read it.
+1. Never guess protocol addresses, contract ABIs, SDK APIs, network IDs, RPC URLs, token IDs, IP IDs, license IDs, explorer URLs, or transaction hashes.
+2. Re-check current official sources before implementing any protocol fact that may have changed.
+3. Unknown = `UNVERIFIED`, never “probably.”
+4. If a core protocol fact is unverified, stop that phase and report the blocker.
+5. Never replace a failed protocol operation with a mock and call it real.
+6. Never fabricate blockchain evidence.
+7. Never display `ACCESS GRANTED` unless the actual protected-read/decryption operation succeeds.
+8. Never display an Explorer link unless the transaction actually exists.
+9. Never put private keys, seed phrases, API credentials, or wallet secrets in Git.
+10. Never request a user's seed phrase or private key.
+11. Never expose a server private key through `NEXT_PUBLIC_*` environment variables.
+12. Never depend on Story's IP Portal as a runtime dependency.
+13. Development uses Story Aeneid/testnet only unless an official requirement later says otherwise.
+14. No paid service may be mandatory for the core demo without explicit approval.
+15. Do not add AI, tokenomics, marketplace, social, analytics, admin, or unrelated features to the MVP.
+16. The application must distinguish `NO LICENSE`, `VERIFICATION ERROR`, `LICENSE VERIFIED`, and `ACCESS GRANTED`.
+17. Legal claims must describe exactly what the software proves and no more.
+18. The user-facing product must remain understandable without blockchain expertise.
+19. A local database must never become the authorization source of truth.
+20. Every completed phase must have a gate and evidence.
 
 ---
 
-# 3. MVP USE CASE
+# 2. PRODUCT DEFINITION
 
-Use one simple fictional demonstration resource:
+## Name
+
+**LicenseVault**
+
+Keep this as the working product name. Do not spend implementation time searching for a replacement unless a real legal/trademark conflict or user decision requires it.
+
+## Category
+
+Licensed access to protected digital content.
+
+## One-line
+
+> **LicenseVault turns an onchain IP license into a real access permission for protected digital content.**
+
+## Plain-English explanation
+
+> **A protected digital asset stays locked until the connected wallet has the license required to read it.**
+
+## Core differentiator
+
+We are not claiming to invent IP licensing.
+
+The differentiating product behavior is:
+
+> **the licensing state is connected to the protected-read operation itself.**
+
+That gives us a visible state transition:
+
+`LOCKED → LICENSED → UNLOCKED`
+
+---
+
+# 3. TARGET USER / DEMO USER
+
+The demo user is a creator, licensor, rights holder, or licensed collaborator who needs to distribute a digital resource only to parties with the correct license.
+
+The first demonstration uses:
 
 **COMMERCIAL BRAND ASSET PACK**
 
-The resource is protected digital content.
+This is a fictional demonstration resource, not a marketplace.
 
-The exact content can be a small demo file or small protected payload.
+The content should be tiny enough for reliable testnet demonstration.
 
-The product does NOT become a real commercial asset marketplace.
+Example protected payload:
+- a small image;
+- a small PDF;
+- or a short text/JSON asset.
 
-The user journey should be understandable without legal or blockchain knowledge.
+Do not expose the plaintext before the authorized read succeeds.
 
 ---
 
 # 4. TECHNICAL THESIS
 
-The important mechanism is:
+The intended protocol relationship is:
 
-```
+```text
 Story IP Asset
-    +
-Story license terms
-    +
-Story license token
-    ↓
-License-aware read condition
-    ↓
-Protected encrypted resource
-    ↓
-READ REJECTED / READ ALLOWED
+     +
+Story License Terms
+     +
+Story License Token
+     ↓
+LicenseReadCondition
+     ↓
+CDR Protected Resource
+     ↓
+Unauthorized wallet → READ REJECTED
+Authorized wallet   → READ ALLOWED
+     ↓
+Protected data recovered
 ```
 
-The strongest known current technical path is Story's Confidential Data Rails (CDR) plus its Aeneid-deployed LicenseReadCondition.
+The current CDR SDK repository is the primary implementation reference:
 
-The current public CDR SDK repository documents LicenseReadCondition as:
+`https://github.com/piplabs/cdr-sdk`
 
-> only Story Protocol license token holders for the specified IP can read.
+The current known SDK behavior includes an Aeneid integration flow where a read without the required license fails and a read after obtaining the license succeeds.
 
-Its current integration tests demonstrate:
-- read without a license fails;
-- a Story license token is minted;
-- the licensed read succeeds;
-- protected data is recovered.
-
-This behavior must be independently reproduced in LicenseVault.
+**This behavior must be independently reproduced, not merely cited.**
 
 ---
 
-# 5. VERIFIED REFERENCE MATERIAL
+# 5. CURRENT PROTOCOL FACTS — VERIFY BEFORE USE
 
-Treat these as current technical references that must be rechecked before implementation if anything has changed:
+These are reference facts observed during research. They are NOT permission to skip current-source verification.
 
-## Story / CDR SDK
+## Story Aeneid
+
+Known current testnet:
+- chain ID: `1315`
+- RPC observed: `https://aeneid.storyrpc.io`
+
+## CDR SDK
 
 Repository:
-https://github.com/piplabs/cdr-sdk
+`https://github.com/piplabs/cdr-sdk`
 
-Current package identified in the repository:
+Package observed:
 `@piplabs/cdr-sdk`
 
-Current repository package version observed:
+Package version observed during research:
 `0.2.2`
 
-Current Aeneid/testnet:
-- chain ID: 1315
-- EVM RPC: `https://aeneid.storyrpc.io`
+## CDR contracts observed
 
-Current CDR system addresses documented by the SDK:
-- DKG: `0xcccccc0000000000000000000000000000000004`
-- CDR: `0xcccccc0000000000000000000000000000000005`
+DKG:
+`0xcccccc0000000000000000000000000000000004`
 
-Current Aeneid LicenseReadCondition documented by the SDK:
+CDR:
+`0xcccccc0000000000000000000000000000000005`
+
+## Aeneid conditions observed
+
+LicenseReadCondition:
 `0xC0640AD4CF2CaA9914C8e5C44234359a9102f7a3`
 
-Current Aeneid OwnerWriteCondition documented by the SDK:
+OwnerWriteCondition:
 `0x4C9bFC96d7092b590D497A191826C3dA2277c34B`
 
-Current Aeneid Story LicenseToken contract used by the SDK's integration fixture:
+## Aeneid LicenseToken fixture observed
+
 `0xFe3838BFb30B34170F00030B52eA4893d8aAC6bC`
 
-IMPORTANT:
-These addresses are protocol reference values, not values to fabricate into a production UI.
-Before any live transaction, read the current source/docs and verify the network and contract bytecode/state.
+Before a real transaction, the coding agent MUST verify these against current SDK source/docs and live network state.
+
+If any value changed, update the build implementation and documentation rather than forcing the old value.
 
 ---
 
-# 6. CURRENT CDR FLOW TO REPRODUCE
+# 6. PROTOCOL DISCOVERY REQUIREMENTS
 
-The public CDR integration test currently exercises this general flow:
+Before application coding, the coding agent must answer in `docs/PROTOCOL_DISCOVERY.md`:
 
-1. Connect to Aeneid.
-2. Fetch the CDR global public key.
-3. Allocate a CDR vault.
-4. Configure:
-   - OwnerWriteCondition for writes;
-   - LicenseReadCondition for reads.
-5. Store encrypted data.
-6. Attempt read with no license token.
-7. Assert the read fails.
-8. Mint a Story license token for the target IP and terms.
-9. Encode the returned license token ID as read auxiliary data.
-10. Attempt the read again.
-11. Assert the protected data is recovered.
-12. Record evidence.
+### Network
+- current Aeneid chain ID;
+- current official RPC;
+- current explorer;
+- current faucet/test asset route.
 
-The implementation must verify every step from current source rather than assume the SDK integration test is unchanged.
+### CDR
+- current SDK version;
+- current CDR contract;
+- current DKG contract;
+- current LicenseReadCondition;
+- current OwnerWriteCondition;
+- current allocation/read/write methods;
+- current condition configuration format.
+
+### Story licensing
+- current IP identifier format;
+- current license terms format;
+- current license token contract/interface;
+- current mint flow;
+- current token-ID representation;
+- current relationship between IP, terms, and token.
+
+### CDR API
+- current DKG/Story API endpoint;
+- whether it supports the required Aeneid operation;
+- whether it is HTTP or HTTPS;
+- whether it can safely be called from server-side infrastructure;
+- timeout behavior.
+
+Every fact must include:
+
+```text
+FACT:
+SOURCE:
+URL:
+VERIFIED DATE:
+NETWORK:
+VERSION/COMMIT:
+CONFIDENCE:
+IMPLEMENTATION IMPACT:
+```
 
 ---
 
-# 7. NETWORK
+# 7. CDR API RISK
 
-Development network:
+Research identified a current CDR SDK reference to a plain-HTTP Aeneid Story API endpoint.
 
-**Story Aeneid testnet**
+This must NOT be blindly embedded in browser code.
 
-Current network identifier observed:
-- chain ID 1315
+The implementation must first verify:
 
-Current documented public EVM RPC:
-`https://aeneid.storyrpc.io`
+1. whether that endpoint is still current;
+2. whether an official TLS endpoint exists;
+3. whether the SDK permits a configurable endpoint;
+4. whether Vercel can reach it;
+5. whether the response is safe for the intended server-side flow.
 
-The CDR SDK also requires a Story-API REST endpoint for DKG/partial-decryption operations.
+If the only viable endpoint is unreliable or unsafe for the required deployment, report `BLOCKED` rather than silently inventing a workaround.
 
-The current SDK repository documents:
-`http://172.192.41.96:1317`
+---
 
-This endpoint is explicitly documented as plain HTTP.
+# 8. ARCHITECTURE
+
+Preferred architecture:
+
+```text
+                 ┌─────────────────────┐
+                 │       Browser       │
+                 │ Wallet + License UI│
+                 └──────────┬──────────┘
+                            │
+                            ↓
+                 ┌─────────────────────┐
+                 │ LicenseVault Next.js│
+                 │     application     │
+                 └──────────┬──────────┘
+                            │
+                  protocol adapter
+                            │
+                            ↓
+                 ┌─────────────────────┐
+                 │ Story / CDR SDK     │
+                 └──────────┬──────────┘
+                            │
+                ┌───────────┴───────────┐
+                ↓                       ↓
+          Story RPC              CDR Story API
+                │                       │
+                └───────────┬───────────┘
+                            ↓
+                  Story / CDR contracts
+```
+
+The browser may ask the wallet to sign a user transaction when required.
+
+Server-only credentials, if any, remain server-side.
+
+Never put a private key in frontend code.
+
+---
+
+# 9. WALLET MODEL
+
+The preferred user path is an EVM-compatible wallet.
+
+User signs only actions that genuinely require user authorization.
+
+For development automation, a disposable Aeneid key may be stored in an ignored environment variable if the SDK requires a server signer.
 
 Rules:
-- never hardcode this into browser/client code;
-- keep it server-side;
-- verify it is reachable and usable before depending on it;
-- if it fails, stop and report the blocker;
-- do not silently replace it with an invented endpoint.
+- never commit it;
+- never print it;
+- never put it in client bundles;
+- never use a valuable wallet;
+- never use Mainnet funds.
+
+The UI should show:
+- connected wallet;
+- shortened address;
+- network;
+- disconnect/switch action if required.
 
 ---
 
-# 8. WALLET MODEL
+# 10. SOURCE-OF-TRUTH ORDER
 
-Preferred browser UX:
+Use this hierarchy whenever sources conflict:
 
-- user connects an EVM-compatible wallet;
-- wallet owns/receives the Story license token;
-- browser signs only user-authorized transactions;
-- no seed phrase or private key ever enters the app.
+1. live Story/CDR chain state;
+2. current official Story/CDR contract implementation;
+3. current official SDK source;
+4. current official documentation;
+5. repository build specification;
+6. application memory/state;
+7. UI assumptions.
 
-For development-only scripted tests, a disposable test key MAY be used through secure environment variables.
-
-Never commit it.
-
-Never print the raw secret.
-
-Never use Mainnet funds.
+Lower levels may never override higher levels.
 
 ---
 
-# 9. ACCESS MODEL
+# 11. CORE STATE MACHINE
 
-The application must have two distinct concepts:
+```text
+                    ┌───────────────┐
+                    │    LOCKED     │
+                    └───────┬───────┘
+                            │
+                       VERIFY LICENSE
+                            │
+                            ↓
+                    ┌───────────────┐
+                    │   CHECKING    │
+                    └───────┬───────┘
+                            │
+              ┌─────────────┴──────────────┐
+              ↓                            ↓
+       ┌──────────────┐             ┌───────────────┐
+       │  NO LICENSE  │             │LICENSE VERIFIED│
+       └──────┬───────┘             └───────┬───────┘
+              │                              │
+              ↓                              ↓
+          LOCKED                        ACCESSING
+                                             │
+                                             ↓
+                                      ┌────────────┐
+                                      │  UNLOCKED  │
+                                      └────────────┘
 
-## A. Eligibility
-
-Does the wallet hold the required license token?
-
-## B. Protected read
-
-Can the wallet actually read/decrypt the protected resource?
-
-The second is the stronger proof.
-
-Do NOT implement:
-
+CHECKING → VERIFICATION ERROR
 ```
-wallet owns token
-→ React setAccessGranted(true)
-```
 
-as the final authorization mechanism.
+## State meanings
 
-The real protected-read operation must succeed.
+**LOCKED:** protected content cannot be read.
+
+**CHECKING:** a real verification/read attempt is in progress.
+
+**NO LICENSE:** the real protocol evidence shows the wallet does not satisfy the license condition.
+
+**LICENSE VERIFIED:** the required license relationship has been established.
+
+**ACCESSING:** the real protected-read/decryption operation is underway.
+
+**UNLOCKED:** protected plaintext/content has actually been recovered.
+
+**VERIFICATION ERROR:** a trustworthy result could not be established.
+
+Never map a network timeout to `NO LICENSE`.
+
+Never map an unknown result to `ACCESS GRANTED`.
 
 ---
 
-# 10. PRODUCT STATE MACHINE
+# 12. THE PRODUCT OBJECT — ACCESS DOCKET
 
+The main visual component is the **Access Docket**.
+
+It should feel like a precise license/access record rather than a generic SaaS card.
+
+Example:
+
+```text
+┌──────────────────────────────────────────┐
+│ LICENSEVAULT                              │
+│ ACCESS DOCKET                              │
+│──────────────────────────────────────────│
+│ PROTECTED ASSET                            │
+│ Commercial Brand Asset Pack               │
+│                                           │
+│ LICENSE REQUIRED                           │
+│ Commercial Use                             │
+│                                           │
+│ LICENSE HOLDER                             │
+│ 0x7F...91C2                                │
+│                                           │
+│ ACCESS                                     │
+│ RESTRICTED                                 │
+│                                           │
+│             [ VERIFY LICENSE ]             │
+└──────────────────────────────────────────┘
 ```
-LOCKED
-  ↓
-CHECKING
-  ↓
-┌─────────────────────┐
-│                     │
-NO LICENSE         LICENSE VERIFIED
-│                     │
-↓                     ↓
-LOCKED            ACCESSING
-                      ↓
-                   UNLOCKED
+
+When successful:
+
+```text
+┌──────────────────────────────────────────┐
+│ LICENSEVAULT                              │
+│ ACCESS DOCKET                              │
+│──────────────────────────────────────────│
+│ PROTECTED ASSET                            │
+│ Commercial Brand Asset Pack               │
+│                                           │
+│ LICENSE                                    │
+│ Commercial Use                             │
+│                                           │
+│ STATUS                                     │
+│ ✓ VERIFIED                                 │
+│                                           │
+│ ACCESS                                     │
+│ GRANTED                                    │
+│                                           │
+│         [ OPEN PROTECTED ASSET ]           │
+└──────────────────────────────────────────┘
 ```
 
-Error branch:
+Do not use generic component naming such as `Card`, `DashboardCard`, `InfoCard`, or `StatCard` for the primary product object.
 
-```
-CHECKING
-   ↓
-VERIFICATION ERROR
-```
+Use product-specific components such as:
 
-Definitions:
-
-### LOCKED
-Protected resource cannot currently be read.
-
-### CHECKING
-The app is querying/verifying protocol state.
-
-### NO LICENSE
-The real gated-read or license-state verification indicates the wallet does not satisfy the rule.
-
-### LICENSE VERIFIED
-The required license relationship has been verified.
-
-### ACCESSING
-The real protected-read/decryption operation is executing.
-
-### UNLOCKED
-The protected resource has actually been recovered.
-
-### VERIFICATION ERROR
-The app could not establish a trustworthy result.
+- `AccessDocket`
+- `ProtectedAsset`
+- `LicenseRecord`
+- `AccessGate`
+- `LicenseStatus`
+- `VerificationTrace`
+- `ProofReceipt`
+- `UnlockAction`
 
 ---
 
-# 11. SIGNATURE INTERACTION
+# 13. VISUAL SYSTEM
 
-Primary interaction:
+## Product world
 
-**VERIFY LICENSE**
+**The Licensed Archive**
 
-Success path:
+The visual metaphor is an archival record whose access threshold can open when the correct right is present.
 
-```
-VERIFY LICENSE
-     ↓
-CHECK LICENSE
-     ↓
-PROTOCOL READ
-     ↓
-LICENSE VERIFIED
-     ↓
-OPEN PROTECTED ASSET
-```
+Visual adjectives:
 
-The memorable state change is:
+- editorial;
+- credible;
+- tactile;
+- precise;
+- restrained.
 
-**LOCKED → UNLOCKED**
+Do NOT make it:
+- cyberpunk;
+- futuristic crypto;
+- courthouse-themed;
+- generic enterprise SaaS;
+- AI-themed.
 
-The user should feel the content opening because the underlying authorization changed.
+## Colors
+
+Starting design tokens, not protocol facts:
+
+- warm paper canvas: `#F4F1E8`
+- near-black ink: `#1C1D1B`
+- secondary gray: `#686B66`
+- rule/border: `#D4D0C5`
+- muted copper accent: `#A7613C`
+- verified green: `#2E6650`
+- error red: `#8C3737`
+- information slate: `#526575`
+
+Do not overuse accent colors.
+
+## Typography
+
+Preferred:
+- editorial serif display such as Newsreader;
+- IBM Plex Sans for interface;
+- IBM Plex Mono for addresses/IDs/protocol data.
+
+If an exact font is unavailable, use a verified free replacement and record the substitution.
 
 ---
 
-# 12. MVP SCREENS
+# 14. LANDING PAGE LOCK
 
-Only four major surfaces:
+The first viewport must contain:
 
-## 1. Landing
+1. LicenseVault name;
+2. clear product proposition;
+3. Access Docket;
+4. protected asset;
+5. license requirement;
+6. current access state;
+7. primary action.
 
-Explain:
-- what LicenseVault is;
-- protected content;
-- license required;
-- CTA.
+Preferred headline:
+
+> **A license should open the door.**
+
+Preferred supporting line:
+
+> **LicenseVault turns an onchain IP license into a real access permission for protected digital content.**
 
 Primary CTA:
+
 `CHECK ACCESS`
 
-## 2. Protected Resource
+Small technical note may say:
+
+`Built with Story`
+
+ONLY if current sponsor/technical wording is appropriate. Never imply a confirmed 2026 bounty without evidence.
+
+Do not lead with:
+- blockchain architecture;
+- sponsor logos;
+- tokenomics;
+- AI;
+- statistics;
+- generic Web3 artwork.
+
+---
+
+# 15. CORE UI SCREENS
+
+## Screen 1 — Landing
+
+Purpose: explain the product immediately.
+
+Hero:
+- headline;
+- short explanation;
+- Access Docket;
+- Check Access.
+
+## Screen 2 — Protected Resource
 
 Show:
-- asset name;
-- preview;
+- resource preview/thumbnail;
+- resource title;
+- protected status;
 - required license;
-- access state;
-- Verify License action.
+- wallet state;
+- Verify License.
 
-## 3. Access Result
+## Screen 3 — Access Result
 
-Show:
-- LICENSE VERIFIED;
-- ACCESS GRANTED;
-- protected content;
-- concise reason.
+Successful:
 
-## 4. Proof
+```text
+LICENSE VERIFIED
 
-Show:
-- IP Asset;
-- license terms;
-- license token;
+ACCESS GRANTED
+
+Commercial Brand Asset Pack
+
+[ OPEN PROTECTED ASSET ]
+```
+
+Failure:
+
+```text
+ACCESS RESTRICTED
+
+No valid license was found for this protected resource.
+
+[ VIEW REQUIREMENT ]
+```
+
+## Screen 4 — Proof
+
+Show actual:
+- IP asset identifier;
+- license terms identifier;
+- license token ID;
 - wallet;
 - network;
-- CDR vault identifier;
-- read transaction;
-- result;
-- explorer links where available.
+- vault identifier;
+- relevant transaction identifiers;
+- protocol result;
+- Explorer links.
 
-Do not build an admin dashboard unless required later.
-
----
-
-# 13. LEGAL LANGUAGE
-
-ALWAYS be precise.
-
-Allowed:
-- licensed content;
-- protected resource;
-- license required;
-- license verified;
-- access granted;
-- access restricted;
-- onchain licensing state;
-- protocol-enforced read condition.
-
-Avoid:
-- copyright guaranteed;
-- piracy prevented;
-- legally compliant;
-- ownership proven;
-- universal DRM;
-- blockchain makes the license legally enforceable everywhere.
-
-LicenseVault controls access to the protected resource inside the application.
-
-It does not control the entire internet and does not guarantee that a legitimate reader cannot copy content after access.
+Proof should explain the causal chain, not dump raw hashes without labels.
 
 ---
 
-# 14. SECURITY INVARIANTS
+# 16. UI STATE DETAILS
 
-## INV-01
-A wallet without the required license cannot successfully read the protected resource.
+## Locked
 
-## INV-02
-A wallet with the correct license can successfully read the intended resource.
+```text
+ACCESS RESTRICTED
 
-## INV-03
-A license for the wrong IP does not satisfy the target resource's read condition.
+This resource requires:
+Commercial Use license
 
-## INV-04
-An arbitrary unrelated token cannot satisfy the license condition.
+[ VERIFY LICENSE ]
+```
 
-## INV-05
-Changing browser state cannot grant access.
+## Checking
 
-## INV-06
-A failed protocol transaction cannot become ACCESS GRANTED.
+Use operational language:
 
-## INV-07
-The app does not silently switch networks.
+`VERIFYING LICENSE`
 
-## INV-08
-Protected plaintext is not sent to the client before authorized recovery.
+Then only show actual substeps if the implementation performs them:
 
-## INV-09
-Private keys remain server-side or inside the user wallet and never enter public source.
+- `READING LICENSE STATE`
+- `CHECKING HOLDER`
+- `REQUESTING PROTECTED READ`
+- `RECOVERING CONTENT`
 
-## INV-10
-Retry logic checks real chain/protocol state rather than assuming the previous request failed.
+No fake progress percentage.
+
+## No license
+
+```text
+ACCESS RESTRICTED
+
+No matching active license was found.
+
+[ VIEW LICENSE REQUIREMENT ]
+```
+
+## Verification error
+
+```text
+LICENSE COULD NOT BE VERIFIED
+
+The current verification request did not produce a confirmed result.
+
+[ TRY AGAIN ]
+[ VIEW DETAILS ]
+```
+
+## Verified
+
+```text
+LICENSE VERIFIED
+
+The required license condition is satisfied.
+
+[ OPEN PROTECTED ASSET ]
+```
+
+## Unlocked
+
+```text
+ACCESS GRANTED
+
+Protected resource recovered successfully.
+
+[ VIEW PROOF ]
+```
 
 ---
 
-# 15. EVIDENCE REQUIREMENTS
+# 17. ERROR SEMANTICS
 
-Canonical run:
+Errors must preserve the difference between:
+
+### Authorization failure
+The protocol says the user is not allowed.
+
+### Infrastructure failure
+The app could not establish the result.
+
+### User cancellation
+The wallet/user rejected the transaction.
+
+### Transaction failure
+The chain rejected the transaction.
+
+### Decryption failure
+The authorized read did not successfully recover plaintext.
+
+Never collapse all of these into:
+
+`Something went wrong.`
+
+---
+
+# 18. SIGNATURE INTERACTION / MOTION
+
+The signature product interaction is:
+
+**VERIFY → ALIGN → OPEN**
+
+Motion should be subtle.
+
+A successful transition can visually change:
+
+`RESTRICTED → VERIFIED → GRANTED`
+
+and reveal the protected content.
+
+No:
+- confetti;
+- neon glow;
+- crypto coin animation;
+- particle cloud;
+- fake blockchain mining;
+- AI sparkle.
+
+Respect reduced-motion preferences.
+
+---
+
+# 19. MOBILE
+
+Mobile must preserve:
+
+1. LicenseVault;
+2. headline;
+3. protected asset;
+4. license requirement;
+5. state;
+6. primary action;
+7. result/proof.
+
+Do not bury the access state below decorative content.
+
+No horizontal scrolling.
+
+Wallet addresses should truncate visually but remain accessible to assistive technology.
+
+---
+
+# 20. ACCESSIBILITY
+
+Required:
+- keyboard navigation;
+- visible focus;
+- semantic buttons;
+- semantic headings;
+- accessible status announcements;
+- sufficient contrast;
+- no color-only status communication;
+- reduced motion;
+- clear disabled states;
+- screen-reader-readable transaction/status labels.
+
+Example:
+Do not communicate only with a green dot.
+Use:
+`LICENSE VERIFIED`.
+
+---
+
+# 21. SECURITY MODEL
+
+Document in `docs/SECURITY.md`:
+
+## Trust boundaries
+- browser;
+- user wallet;
+- LicenseVault server;
+- Story RPC;
+- CDR API;
+- Story contracts;
+- protected content.
+
+## Threats
+- fake client-side authorization;
+- wrong license token;
+- wrong IP;
+- wrong terms;
+- replay/retry confusion;
+- wrong chain;
+- malicious resource metadata;
+- leaked server key;
+- exposed protected plaintext;
+- manipulated proof display;
+- stale cached license state.
+
+## Required properties
+- protocol result is authoritative;
+- private key isolation;
+- network validation;
+- strict input validation;
+- explicit failure states;
+- no secret logging;
+- no trust in client-reported authorization.
+
+---
+
+# 22. TEST MATRIX
+
+## Unit
+
+Test:
+- state transitions;
+- error classification;
+- license-token input parsing;
+- amount/ID formatting;
+- proof formatting;
+- network validation.
+
+## Protocol integration
+
+Test:
+- Aeneid connectivity;
+- CDR allocation;
+- write condition;
+- read condition;
+- unauthorized read;
+- license mint;
+- authorized read;
+- decryption.
+
+## Adversarial
+
+At minimum:
+
+| Test | Expected |
+|---|---|
+| no license | read rejected |
+| wrong IP license | read rejected |
+| wrong terms/license | read rejected |
+| arbitrary token | read rejected |
+| malformed auxiliary data | rejected safely |
+| wrong chain | blocked |
+| user rejects wallet action | clear cancellation |
+| tx reverts | failure, not success |
+| timeout | unknown/error, not success |
+| refresh after success | state revalidated |
+| forged client state | cannot grant protected read |
+
+---
+
+# 23. EVIDENCE MODEL
+
+Canonical run name:
 
 `licensevault-aeneid-001`
 
-Record:
+Suggested evidence tree:
 
-```
-NETWORK
-CHAIN ID
-COMMIT
-PACKAGE VERSIONS
-IP ASSET
-LICENSE TERMS
-LICENSE TOKEN
-VAULT UUID
-PAYER / USER WALLET
-UNAUTHORIZED READ TX / RESULT
-LICENSE MINT TX
-AUTHORIZED READ TX / RESULT
-DECRYPTION RESULT
-EXPLORER LINKS
-FINAL RESULT
-```
-
-Suggested directory:
-
-```
+```text
 evidence/
 └── licensevault-aeneid-001/
     ├── environment.json
     ├── ip-asset.json
     ├── license-terms.json
+    ├── license-token.json
     ├── vault.json
     ├── unauthorized-read.json
     ├── license-mint.json
@@ -509,311 +888,391 @@ evidence/
     └── verification.json
 ```
 
-Never create evidence files for events that did not occur.
+Each artifact should contain only facts actually observed.
+
+Where a transaction exists, record:
+- tx hash;
+- chain/network;
+- block if available;
+- operation;
+- relevant contract;
+- explorer URL if verified.
+
+Never manufacture an explorer URL from a guessed hash.
 
 ---
 
-# 16. VERIFIER
+# 24. INDEPENDENT VERIFIER
 
 Create:
 
 `tools/verify-canonical-run.ts`
 
-It must independently verify as much as practical.
+It should independently check the evidence against live protocol state wherever practical.
 
-Minimum checks:
+Minimum result set:
 
+```text
+NETWORK: PASS
+IP ASSET: PASS
+LICENSE TERMS: PASS
+LICENSE TOKEN: PASS
+VAULT: PASS
+UNAUTHORIZED READ: PASS
+AUTHORIZED READ: PASS
+DECRYPTION: PASS
+FINAL RESULT: PASS
 ```
-NETWORK PASS
-IP ASSET PASS
-LICENSE PASS
-LICENSE TOKEN PASS
-VAULT PASS
-UNAUTHORIZED READ PASS
-LICENSED READ PASS
-DECRYPTION PASS
-RESULT PASS
-```
 
-The verifier must not simply trust `evidence/*.json`.
-
-It must query the current network/protocol wherever practical.
+If the verifier cannot independently confirm a claim, report `UNVERIFIED` rather than PASS.
 
 ---
 
-# 17. CLAIM STATUS
+# 25. CLAIM REGISTER
 
 Create:
 
 `docs/CLAIM_STATUS.md`
 
-Initial statuses:
+Initial table:
 
 | Claim | Status |
 |---|---|
-| Story IP licensing exists | PROVEN |
-| Aeneid exists | PROVEN |
-| CDR exists on Aeneid | PROVEN |
-| LicenseReadCondition exists on Aeneid | PROVEN |
-| Current SDK integration demonstrates gated read | OBSERVED |
-| LicenseVault independently reproduces gated read | UNVERIFIED |
-| LicenseVault blocks unauthorized access | UNVERIFIED |
-| LicenseVault permits licensed access | UNVERIFIED |
-| Story is a confirmed BLI 2026 bounty | UNVERIFIED |
-| Universal copyright protection | UNSUPPORTED |
+| Story supports programmable IP licensing | PROVEN |
+| Story Aeneid is available | PROVEN |
+| CDR is available on Aeneid | PROVEN/REVERIFY |
+| LicenseReadCondition is deployed | PROVEN/REVERIFY |
+| SDK integration demonstrates license-gated read | OBSERVED |
+| LicenseVault reproduces the gated read | UNVERIFIED |
+| Unauthorized wallet is blocked | UNVERIFIED |
+| Authorized wallet succeeds | UNVERIFIED |
+| Story is a 2026 BLI bounty | UNVERIFIED |
+| LicenseVault prevents all copying/piracy | UNSUPPORTED |
 
-Use:
+Allowed statuses:
+
 `PROVEN / OBSERVED / INFERRED / UNVERIFIED / UNSUPPORTED`
 
 ---
 
-# 18. TESTING
+# 26. DOCUMENTATION REQUIRED
 
-Test order:
+Before final submission, create:
 
-1. unit;
-2. protocol integration;
-3. adversarial;
-4. live canonical E2E.
+```text
+docs/
+├── PROTOCOL_DISCOVERY.md
+├── PROTOCOL_DECISION.md
+├── ARCHITECTURE.md
+├── SECURITY.md
+├── CLAIM_STATUS.md
+├── COST_MATRIX.md
+├── LIMITATIONS.md
+├── EVIDENCE.md
+└── UX_TEST.md
+```
 
-Unit tests should cover:
-- state transitions;
-- address/config validation;
-- license-token decoding;
-- proof formatting;
-- error mapping.
+## COST_MATRIX.md
 
-Protocol tests should cover:
-- vault creation;
+For every dependency:
+- purpose;
+- plan/tier;
+- cost;
+- quota;
+- credential requirement;
+- expiry/credit risk;
+- official source;
+- verified date;
+- mandatory/optional.
+
+Gate:
+**ZERO-COST CORE PATH PASS**
+
+## LIMITATIONS.md
+
+Include actual limitations such as:
+- testnet only;
+- fictional demo asset;
+- hackathon scale;
+- public infrastructure limits;
+- protected resource scope;
+- no universal DRM claim;
+- no legal advice;
+- no guarantee of downstream copying prevention.
+
+## UX_TEST.md
+
+Test a stranger:
+- can they identify what LicenseVault does in 5 seconds?
+- can they explain the license/access relationship in 30 seconds?
+- can they identify why access changed?
+
+Do not manufacture positive results.
+
+---
+
+# 27. IMPLEMENTATION PHASES
+
+## BUILD 0 — Repo hygiene
+
+Create/verify:
+- Next.js + TypeScript app;
+- package manager lockfile;
+- `.gitignore`;
+- env example;
+- README skeleton;
+- docs directory;
+- test structure.
+
+Gate:
+`install + lint + typecheck`
+
+## BUILD 1 — Protocol discovery
+
+Create:
+- `docs/PROTOCOL_DISCOVERY.md`
+- `docs/PROTOCOL_DECISION.md`
+
+Gate:
+All core protocol facts verified.
+
+## BUILD 2 — Minimal protocol spike
+
+No UI required.
+
+Prove:
+- Aeneid connection;
+- CDR allocation;
+- protected resource;
 - unauthorized read rejection;
-- license mint;
+- license acquisition;
 - authorized read;
-- decryption.
+- decrypted content.
 
-Adversarial tests should cover:
-- wrong IP;
-- wrong license terms;
-- wrong token;
-- empty license list;
-- malformed auxiliary data;
-- wrong chain;
-- reverted transaction;
-- retry after timeout;
-- browser refresh.
+Gate:
+**REAL LOCK → UNLOCK PASS**
 
----
+## BUILD 3 — Evidence
 
-# 19. COST RULE
+Create canonical evidence and verifier.
 
-Core path should remain $0.
+Gate:
+Independent verification passes.
 
-Preferred:
-- Aeneid testnet;
-- Story faucet/test assets;
-- open-source SDK;
-- GitHub;
-- free hosting if adequate.
+## BUILD 4 — Protocol adapter
 
-Do not add:
-- paid database;
-- paid RPC;
-- paid storage;
-- paid AI;
-- paid monitoring;
-- paid legal API
+Create a clean application boundary around CDR/Story calls.
 
-unless the dependency is genuinely required and explicitly approved.
+The UI must not contain raw protocol logic everywhere.
 
----
+Gate:
+Unit + integration tests pass.
 
-# 20. STORAGE
+## BUILD 5 — Product UI
 
-CDR protects encrypted data.
+Implement the four MVP surfaces.
 
-For MVP, prefer the smallest payload possible.
+Gate:
+Complete real end-to-end flow.
 
-Do not build a large file-storage platform.
+## BUILD 6 — Visual system
 
-A tiny protected demo resource is enough.
+Implement the locked Access Docket / Licensed Archive direction.
 
-If an offchain storage provider becomes necessary for the actual protected-file path, choose one current open/free provider supported by the SDK and document the cost and limits.
+Gate:
+Visual quality >=20/24.
 
-The protected data key and read authorization remain the critical security boundary.
+## BUILD 7 — Security / adversarial
 
----
+Run security matrix and secret scanning.
 
-# 21. SERVER ARCHITECTURE
+Gate:
+No critical unresolved issue.
 
-Preferred:
+## BUILD 8 — Deployment
 
-```
-Browser
-   ↓
-LicenseVault Next.js app
-   ↓
-server-side protocol adapter
-   ↓
-Story RPC + CDR Story-API
-   ↓
-Story / CDR contracts
+Prove:
+
+```text
+browser
+→ hosted LicenseVault
+→ wallet
+→ Story
+→ CDR
+→ protected read
+→ actual result
 ```
 
-If a browser wallet must sign a user transaction, the wallet signs it directly.
+Gate:
+Live canonical flow.
 
-Server-only secrets:
-- test/development private key, if genuinely required;
-- internal API configuration;
-- any non-public service credential.
+## BUILD 9 — Submission
 
-Never prefix secrets with `NEXT_PUBLIC_`.
+Produce:
+- README;
+- live URL;
+- demo video;
+- proof/evidence;
+- architecture;
+- limitations;
+- submission copy.
+
+Gate:
+Independent judge can understand and verify the project.
 
 ---
 
-# 22. DEPLOYMENT
+# 28. DEMO CONTRACT
+
+The final 60-second demo should show:
+
+```text
+0–05s  LicenseVault + protected asset
+05–15s Try without license → REJECTED
+15–30s Obtain/activate real license
+30–42s Verify again → LICENSE VERIFIED
+42–50s Protected resource opens
+50–60s Proof / onchain evidence
+```
+
+The exact timings may change if real protocol confirmation takes longer.
+
+Never speed up or fake a blockchain operation to fit the timestamp.
+
+If a transaction takes longer, show honest waiting or pre-record a real completed run and clearly identify it as a recorded real run.
+
+---
+
+# 29. JUDGE MESSAGE
+
+Primary message:
+
+> **The license isn't just a record. It opens the door.**
+
+Problem:
+A legal license grants a right, but software often needs a concrete mechanism to apply that right to digital access.
+
+Solution:
+LicenseVault connects an onchain IP license to a protected read condition.
+
+Why blockchain:
+The licensing relationship is represented onchain and can be used as an authorization condition.
+
+Why Story:
+Story supplies the IP/licensing primitives used by the access mechanism.
+
+Novelty:
+Not “we invented licensing.”
+
+Instead:
+> **We turn licensing state into an executable access decision for protected digital content.**
+
+---
+
+# 30. COMPETITIVE BOUNDARY
+
+Do not claim:
+- first blockchain licensing platform;
+- no competitors;
+- universal DRM;
+- guaranteed compliance.
+
+Position against adjacent products by emphasizing the specific workflow:
+
+`LICENSE → PROTECTED READ → ACCESS RESULT`
+
+not:
+- legal document storage;
+- generic compliance dashboard;
+- AI legal advice;
+- IP marketplace;
+- NFT gallery.
+
+---
+
+# 31. WHAT NOT TO BUILD
+
+Do not build in MVP:
+
+- AI legal assistant;
+- chatbot;
+- token launch;
+- marketplace;
+- NFT collection;
+- exchange;
+- DeFi;
+- DAO;
+- social network;
+- generic analytics dashboard;
+- enterprise admin portal;
+- subscription billing;
+- fiat payments;
+- camera/hardware integration;
+- universal DRM;
+- custom Story replacement contract;
+- bridge;
+- oracle network.
+
+If a feature does not strengthen the real licensed-read flow, it is probably out of scope.
+
+---
+
+# 32. VISUAL QUALITY GATE
+
+Score each 0–2:
+
+1. product clarity;
+2. product-specific identity;
+3. technical mechanism visibility;
+4. hierarchy;
+5. typography;
+6. spacing/density;
+7. signature interaction;
+8. state coverage;
+9. motion;
+10. mobile;
+11. technical honesty;
+12. judge proof.
 
 Target:
-Vercel or another free Node-compatible host.
+**20/24 minimum**
 
-Before calling the app production-ready, verify:
+A zero in:
+- clarity;
+- identity;
+- mechanism;
+- honesty
 
-```
-Browser
-→ hosted app
-→ Story RPC
-→ CDR API
-→ real transaction / read
-→ real state
-→ browser result
-```
-
-No persistent-process assumptions.
-
-Document request duration and timeout behavior.
+triggers redesign.
 
 ---
 
-# 23. IMPLEMENTATION PHASES
+# 33. FINAL NO-GO CONDITIONS
 
-## Phase 0 — Repo + environment
+The project is NO-GO if any of these remain true at submission:
 
-Output:
-- Next.js TypeScript app;
-- package setup;
-- env validation;
-- README skeleton;
-- docs structure;
-- secure .gitignore.
-
-Gate:
-- install;
-- lint;
-- typecheck;
-- no secrets.
-
-## Phase 1 — Protocol spike
-
-Output:
-- current SDK installed;
-- Aeneid connectivity;
-- read chain ID;
-- read current CDR/LRT deployment;
-- verify LicenseReadCondition code/address.
-
-Gate:
-- real protocol connectivity.
-
-## Phase 2 — Protected vault
-
-Output:
-- create/prepare one protected CDR resource.
-
-Gate:
-- real vault exists.
-
-## Phase 3 — Unauthorized access
-
-Output:
-- attempt read without license.
-
-Gate:
-- protocol rejects it.
-
-## Phase 4 — Licensed access
-
-Output:
-- obtain correct license;
-- retry read;
-- recover protected data.
-
-Gate:
-- protocol allows it and decrypted content is real.
-
-## Phase 5 — Evidence + verifier
-
-Output:
-- canonical run;
-- verifier;
-- claim status;
-- security tests.
-
-Gate:
-- independent verification.
-
-## Phase 6 — Core application
-
-Output:
-- landing;
-- protected resource;
-- access gate;
-- result;
-- proof.
-
-Gate:
-- end-to-end product flow works.
-
-## Phase 7 — Visual polish
-
-Output:
-- final visual system;
-- responsive layout;
-- motion;
-- accessibility.
-
-Gate:
-- visual quality target >=20/24.
-
-## Phase 8 — Hardening
-
-Output:
-- retries;
-- errors;
-- deployment checks;
-- secret scan;
-- regression tests.
-
-Gate:
-- no critical unresolved issue.
-
-## Phase 9 — Demo
-
-Output:
-- final 60-second sequence;
-- screenshots;
-- README;
-- live link.
-
-Gate:
-- judge can understand it quickly and verify it.
+1. The core gated read is simulated.
+2. Unauthorized access is not actually rejected.
+3. Authorized access is not actually demonstrated.
+4. The app claims ACCESS GRANTED from local state only.
+5. Fake transaction hashes or explorer links exist.
+6. A private key/secret is committed.
+7. A critical protocol fact was guessed.
+8. The required protocol path is unreproducible.
+9. Mandatory paid infrastructure is unverified/unapproved.
+10. A critical security issue remains unresolved.
+11. Legal claims materially exceed what the system proves.
+12. The live demo cannot reproduce or honestly show a real completed run.
 
 ---
 
-# 24. PHASE REPORT
+# 34. PHASE REPORT FORMAT
 
-Every phase ends with:
+Every coding phase must finish with:
 
-```
+```text
 PHASE:
-STATUS: PASS | FAIL | BLOCKED
+STATUS: PASS | BLOCKED | FAILED
 COMMIT:
 FILES CHANGED:
 DEPENDENCIES:
@@ -826,91 +1285,64 @@ BLOCKERS:
 NEXT PHASE:
 ```
 
-If blocked:
-
-```
-PHASE:
-STATUS: BLOCKED
-
-BLOCKER:
-WHAT IS UNKNOWN:
-WHY IT MATTERS:
-SOURCE CHECKED:
-WHAT I NEED:
-SAFE NEXT STEP:
-```
+Blocked means stop. Do not silently continue with a mock.
 
 ---
 
-# 25. NO-GO CONDITIONS
+# 35. FIRST CODING TASK
 
-Do not continue to UI polish if:
+DeepSeek should NOT begin with the homepage.
 
-- unauthorized access is only simulated;
-- licensed access is only simulated;
-- CDR deployment is unavailable;
-- LicenseReadCondition cannot be reproduced;
-- Story integration is only decorative;
-- a fake token is used;
-- the app grants access based only on local React state;
-- secret is committed;
-- protected plaintext is leaked;
-- paid infrastructure becomes mandatory without review;
-- protocol facts cannot be verified.
+Start with a minimal protocol harness.
 
----
+Exact order:
 
-# 26. FIRST BUILD TASK
+1. inspect the current official CDR SDK source;
+2. verify package/version;
+3. verify Aeneid connectivity;
+4. verify current CDR/LRT addresses;
+5. verify LicenseReadCondition;
+6. inspect the current integration test;
+7. reproduce the smallest real protected vault;
+8. prove read rejection without license;
+9. obtain the correct license using the current supported mechanism;
+10. prove successful licensed read;
+11. recover protected plaintext;
+12. save real evidence;
+13. report PASS/BLOCKED/FAILED.
 
-Do NOT build the landing page first.
-
-Do NOT build the final branding first.
-
-Do NOT build an admin dashboard.
-
-Do this first:
-
-1. Create a minimal TypeScript/Node test harness.
-2. Connect to Story Aeneid.
-3. Verify chain ID.
-4. Install/use the current `@piplabs/cdr-sdk`.
-5. Verify current CDR deployment.
-6. Verify current LicenseReadCondition deployment.
-7. Reproduce the SDK's unauthorized-read failure.
-8. Reproduce the licensed-read success.
-9. Save real transaction/state evidence.
-10. Stop and report if any part is blocked.
-
-The first success milestone is:
-
-```
-AENEID
-  ↓
-REAL PROTECTED RESOURCE
-  ↓
-NO LICENSE
-  ↓
-READ REJECTED
-  ↓
-REAL LICENSE
-  ↓
-READ ACCEPTED
-  ↓
-REAL PROTECTED DATA RECOVERED
-```
-
-Only after this passes should the main LicenseVault application be built.
+Do not begin UI implementation until this gate passes.
 
 ---
 
-# 27. FINAL PRODUCT PRINCIPLE
+# 36. FINAL PRINCIPLE
 
-The product is not:
+**The protocol proves the access. The UI explains the access.**
 
-> a dashboard showing that a wallet owns a license.
+LicenseVault succeeds only when the protected resource itself respects the licensing condition.
 
-The product is:
+A beautiful screen saying `LICENSE VERIFIED` is worthless if the resource can still be read without the license.
 
-> **a protected resource whose access actually depends on the licensing state.**
+The first milestone is therefore not a website.
 
-That distinction is the core of LicenseVault.
+It is this:
+
+```text
+STORY AENEID
+      ↓
+REAL IP / LICENSE
+      ↓
+REAL CDR PROTECTED RESOURCE
+      ↓
+NO LICENSE → REAL READ FAILURE
+      ↓
+CORRECT LICENSE
+      ↓
+REAL READ SUCCESS
+      ↓
+REAL PROTECTED DATA
+      ↓
+INDEPENDENTLY VERIFIABLE EVIDENCE
+```
+
+Only after that is LicenseVault ready to become a polished product.
